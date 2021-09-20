@@ -3,6 +3,7 @@
 
 import json
 import time
+import datetime
 
 from odoo.http import content_disposition, request, route
 from odoo.tools.safe_eval import safe_eval
@@ -30,10 +31,15 @@ class ReportController(report.ReportController):
                 context.update(data["context"])
             xlsx = report.with_context(context).render_xlsx(docids, data=data)[0]
             report_name = report.report_file
-            if report.print_report_name and not len(docids) > 1:
-                obj = request.env[report.model].browse(docids[0])
+            if docids:
+                if report.print_report_name and not len(docids) > 1:
+                    obj = request.env[report.model].browse(docids[0])
+                    report_name = safe_eval(
+                        report.print_report_name, {"object": obj, "time": time}
+                    )
+            elif report.print_report_name:
                 report_name = safe_eval(
-                    report.print_report_name, {"object": obj, "time": time}
+                    report.print_report_name, {"datetime": datetime}
                 )
             xlsxhttpheaders = [
                 (
