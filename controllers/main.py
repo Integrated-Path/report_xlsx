@@ -35,7 +35,8 @@ class ReportController(report.ReportController):
                 if report.print_report_name and not len(docids) > 1:
                     obj = request.env[report.model].browse(docids[0])
                     report_name = safe_eval(
-                        report.print_report_name, {"object": obj, "time": time}
+                        report.print_report_name, {
+                            "object": obj, "time": time, "datetime": datetime}
                     )
             elif report.print_report_name:
                 report_name = safe_eval(
